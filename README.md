@@ -7,8 +7,8 @@ Hello, world!
 ## Description
 
 ## Code samples
+Demonstrations of implementations of various necessary actions using the `kosu.js` and `web3` libraries.
 
-- Demonstrations of implementations of various necessary actions using the `kosu.js` and `web3` libraries.
 - You must have the latest version of [`kosu.js`](https://www.npmjs.com/package/@kosu/kosu.js) installed in your project, as well as [a specific version of `web3`](https://www.npmjs.com/package/web3/v/1.0.0-beta.37). 
 - The [`bignumber.js`](https://www.npmjs.com/package/bignumber.js) package should also be available. 
 - Additional notes:
@@ -19,7 +19,7 @@ Hello, world!
   - Most numbers (from `kosu.js` and `web3`) are expected as, and returned as [`BigNumber`](https://www.npmjs.com/package/bignumber.js) instances.
   - Most token values are returned as, and expected in units of wei, so remember to convert where necessary.
   - Methods that use the `await` keyword imply they are in `async` functions, even if not shown.
- - Promise syntax may be used if necessary, but we recommend `async/await` where possible.
+  - Promise syntax may be used if necessary, but we recommend `async/await` where possible.
 
 ### View token balance
 - **Description:** view the user's balance of KOSU tokens in wei (does not include treasury balance).

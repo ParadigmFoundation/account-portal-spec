@@ -10,7 +10,7 @@ Hello, world!
 
 Demonstrations of implementations of various necessary actions using the `kosu.js` and `web3` libraries.
 
-You must have the latest version of [`kosu.js`](https://www.npmjs.com/package/@kosu/kosu.js) installed in your project, as well as [a specific version of `web3`](https://www.npmjs.com/package/web3/v/1.0.0-beta.37).
+You must have the latest version of [`kosu.js`](https://www.npmjs.com/package/@kosu/kosu.js) installed in your project, as well as [a specific version of `web3`](https://www.npmjs.com/package/web3/v/1.0.0-beta.37). The [`bignumber.js`](https://www.npmjs.com/package/bignumber.js) package should also be available. 
 
 Additional notes:
 - Examples include TypeScript type definitions where possible.
@@ -31,43 +31,60 @@ Additional notes:
   ```
 
 ### Set treasury allowance
-- **Description:**
+- **Description:** indicate a number of the user's KOSU tokens (in wei) that the treasury may spend/move on their behalf.
+- **Notes:**
+  - An allowance for the treasury must be set prior to bonding tokens or staking.
+  - To set an "unlimited" allowance, you can use the maximum `uint256` value (shown below).
 - **Example:**
-  ```javascript
-  
+  ```typescript
+  const MAX_UINT_256: BigNumber = new BigNumber("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+  const MAX_UINT_256_WEI: BigNumber = new BigNumber(web3.utils.toWei(MAX_UINT_256));
+
+  // will prompt for user signature (i.e. MetaMask)
+  const receipt: TransactionReceiptWithDecodedLogs = await kosu.treasury.approveTreasury(
+      MAX_UINT_256_WEI,
+  );
+  ```
+
+### View treasury allowance
+- **Description:** see the current treasury allowance for the user (detected via `coinbase`).
+- **Note:** this method is useful to detect if an allowance must be set for the user.
+- **Example:**
+  ```typescript
+  const currentAllowance: BigNumber = await kosu.treasury.treasuryAllowance();
   ```
 
 ### Deposit tokens
 - **Description:**
 - **Example:**
-  ```javascript
+  ```typescript
   
   ```
 
 ### Withdraw tokens
 - **Description:**
 - **Example:**
-  ```javascript
+  ```typescript
   
   ```
 
 ### View treasury balance
 - **Description:**
 - **Example:**
-  ```javascript
+  ```typescript
   
   ```
 
 ### Bond (register) tokens
 - **Description:**
 - **Example:**
-  ```javascript
+  ```typescript
   
   ```
 
 ### Un-bond (release) tokens
 - **Description:**
 - **Example:**
-  ```javascript
+  ```typescript
   
   ```

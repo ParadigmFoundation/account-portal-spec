@@ -23,6 +23,7 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
 
 ### View token balance
 - **Description:** view the user's balance of KOSU tokens in wei (does not include treasury balance).
+- **Method:** `kosu.kosuToken.balanceOf`
 - **Example:**
   ```typescript
   const coinbase: string = await web3.eth.getCoinbase();
@@ -31,11 +32,14 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
 
 ### Set treasury allowance
 - **Description:** indicate a number of the user's KOSU tokens (in wei) that the treasury may spend/move on their behalf.
+- **Method:** `kosu.treasury.approveTreasury`
 - **Notes:**
   - An allowance for the treasury must be set prior to bonding tokens or staking.
   - To set an "unlimited" allowance, you can use the maximum `uint256` value (shown below).
 - **Example:**
   ```typescript
+  // Setting an "unlimited" treasury allowance
+
   const MAX_UINT_256_STR = "115792089237316195423570985008687907853269984665640564039457584007913129639935";
   const MAX_UINT_256: BigNumber = new BigNumber(MAX_UINT_256_STR);
   const MAX_UINT_256_WEI: BigNumber = new BigNumber(web3.utils.toWei(MAX_UINT_256));
@@ -48,24 +52,38 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
 
 ### View treasury allowance
 - **Description:** see the current treasury allowance for the user (detected via `coinbase`).
+- **Method:** `kosu.treasury.treasuryAllowance`
 - **Note:** this method is useful to detect if an allowance must be set for the user.
 - **Example:**
   ```typescript
+  // Reading the user's treasury allowance
+
   const currentAllowance: BigNumber = await kosu.treasury.treasuryAllowance();
   ```
 
 ### Deposit tokens
-- **Description:**
+- **Description:** transfer tokens from the user's wallet to the Kosu treasury.
+- **Method:** `kosu.treasury.deposit`
+- **Note:** the user must have sufficient [treasury allowance](#view-treasury-allowance) set prior to depositing.
 - **Example:**
   ```typescript
-  
+  // Depositing 10 KOSU tokens into the treasury
+
+  const TEN_TOKENS_WEI: BigNumber = new BigNumber(web3.utils.toWei("10"));
+
+  // will prompt for user signature (i.e. MetaMask)
+  const receipt: TransactionReceiptWithDecodedLogs = await kosu.treasury.deposit(
+      TEN_TOKENS_WEI,
+  );
   ```
 
 ### Withdraw tokens
 - **Description:**
 - **Example:**
   ```typescript
-  
+  // Withdrawing 10 KOSU tokens from the treasury
+
+
   ```
 
 ### View treasury balance

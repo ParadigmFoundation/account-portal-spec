@@ -37,7 +37,8 @@ Additional notes:
   - To set an "unlimited" allowance, you can use the maximum `uint256` value (shown below).
 - **Example:**
   ```typescript
-  const MAX_UINT_256: BigNumber = new BigNumber("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+  const MAX_UINT_256_STR = "115792089237316195423570985008687907853269984665640564039457584007913129639935";
+  const MAX_UINT_256: BigNumber = new BigNumber(MAX_UINT_256_STR);
   const MAX_UINT_256_WEI: BigNumber = new BigNumber(web3.utils.toWei(MAX_UINT_256));
 
   // will prompt for user signature (i.e. MetaMask)

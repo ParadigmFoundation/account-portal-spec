@@ -26,14 +26,14 @@ The account portal is essentially one main page, with three data/interactive sec
 On load, the main page has no ability to display data before the user clicks "connect to Metamask" allowing the web app access to the Ethereum blockchain. 
 
 #### Before Metamask connection
-https://sketch.cloud/s/VvZQ8/a/VmJeWa
+![Metamask not connected](./images/not-connected.png)
 
 - Displays the main page prior to Metamask connection.
 - Upon clicking the button, the app should attempt to [connect to Metamask](#connecting-to-metamask).
 - If it is determined the browser is incompatible, handle appropriately.
 
 #### Connected, no allowance
-https://sketch.cloud/s/VvZQ8/a/bd5kx9
+![Connected, no allowance (cropped)](./images/connected-no-allowance.png)
 
 - Displays the main page after `window.ethereum` has been `.enable`d during Metamask connection.
 - The methods for loading all data displayed in this image are discussed in the sections below.
@@ -41,17 +41,17 @@ https://sketch.cloud/s/VvZQ8/a/bd5kx9
 - Clicking on one of the greyed out cards prompts the user with a transaction to [set an "unlimited" allowance for the Treasury](#set-treasury-allowance).
 
 #### Connected, allowance set
-https://sketch.cloud/s/VvZQ8/a/vJ0WRb
+![Metamask connected and treasury allowance set](./images/connected-allowance-set.png)
 
 - After an [allowance for the treasury](#set-treasury-allowance) has been set, the cards are fully visible.
 
 ### Balance page
 _Each card in the "your tokens" UI section has a sub-section here._
-https://sketch.cloud/s/VvZQ8/a/dGKYj2
+![Your tokens card cluster](./images/your-tokens-section.png)
 
 - The "your tokens" section gives the user information about their token balances, and allows them to interact with the Kosu treasury and poster registry contracts.
 - Descriptions of each card's contents, and where to load the value from is described below.
-- The "write" actions (deposit, bond, etc.) for this "your tokens" component are described in a later section.
+- The "write" actions (deposit, bond, etc.) for this "your tokens" component are described in later sections.
 
 #### Total balance
 - The sum of the tokens held within the user's wallet, and the Kosu contract system.
@@ -83,8 +83,14 @@ This section describes how to interact with the treasury beyond just viewing bal
 
 As detailed below, the cases of "adding to treasury" and "editing treasury balance" are handled separately. I.E., when the user has no treasury balance there is an option to add tokens, which is a separate user flow than if they already had tokens and are editing their balance or withdrawing. 
 
+#### Initial no treasury balance
+![Treasury shows add](./images/treasury-no-tokens.png)
+
+- If the user has [no treasury balance](#view-treasury-balance), the "in treasury" card should show an "add" button.
+- Once they have a non-zero balance, the button should show "edit" instead.
+
 #### Initial add to treasury
-https://sketch.cloud/s/VvZQ8/a/OkrJe8
+![Initial treasury deposit popup](./images/treasury-initial-add.png)
 
 - If the user [has no tokens in the treasury,](#view-treasury-balance) the "add" button should be displayed in the top-right of the "in treasury" card.
 - Clicking this button brings the user to the state displayed above, where they are prompted to enter an amount of tokens to deposit.
@@ -94,19 +100,19 @@ https://sketch.cloud/s/VvZQ8/a/OkrJe8
 - The "add" button should indicate the transaction is confirming ("adding..." or a spinning loop) until the promise returned by the `deposit` method resolves, at which point the pop-up can close.
 
 #### Display edit button after deposit
-https://sketch.cloud/s/VvZQ8/a/DvxDEq
+![Treasury card shows edit button](./images/treasury-edit-button.png)
 
 - If the user [has a non-zero treasury balance](#view-treasury-balance) (i.e. they just deposited, as described above) the "add" button should be replaced with an "edit" button.
 
 #### Edit popup
-https://sketch.cloud/s/VvZQ8/a/jOzY40
+![Treasury edit popup](./images/treasury-edit-popup.png)
 
 - Clicking the "edit" button brings the user to this popup, which prompts to ["edit current balance"](#adjust-button) or to ["remove entire balance"](#withdraw-all).
 - The "edit current balance" brings the user to a further popup (next sub-section).
 - The "remove entire balance" button should [trigger a withdrawal](#withdraw-tokens) after the [confirmation is clicked](#withdraw-all).
 
 #### Adjust button 
-https://sketch.cloud/s/VvZQ8/a/zGRWyW
+![Treasury edit => adjust popup](./images/treasury-adjust-popup.png)
 
 - The adjust page [displays the users current treasury balance](#view-treasury-balance), and has a field to enter a new balance.
 - After entering a new balance, the page should display the necessary change:
@@ -135,7 +141,7 @@ https://sketch.cloud/s/VvZQ8/a/zGRWyW
   ```
 
 #### Withdraw all 
-https://sketch.cloud/s/VvZQ8/a/l9m9KO
+![Treasury withdraw all confirm](./images/treasury-withdraw-confirm.png)
 
 - If the user clicks "remove entire balance" from the [edit popup](#edit-popup), they are prompted to confirm.
 - If they click confirm again, their full [treasury balance](#view-treasury-balance) should be [withdrawn from the treasury](#withdraw-tokens).
@@ -150,14 +156,14 @@ The "bonded" card within the "your tokens" section has a button ("add"/"edit") t
 Similar to the treasury card, the cases of an "initial add" versus a "subsequent edit" are treated separately at the UI level. This is described below. 
 
 #### Initial add bond
-https://sketch.cloud/s/VvZQ8/a/7OKeWZ
+![Bond initial add (blank)](./images/bond-initial-blank.png)
 
 - The "bonded" tokens card has a "bond" button in the top right.
 - If the user [has no tokens bonded already](#view-bonded-token-balance), clicking bond brings them to this sate.
 - The confirm button is greyed out until they enter an amount (next sub-section).
 
 #### Initial add bond enter amount
-https://sketch.cloud/s/VvZQ8/a/yeovKK
+![Bond initial add (blank)](./images/bond-initial-filled.png)
 
 - As the user types in an amount, the progress bar below shows what percentage of their treasury balance it would use. 
 - If they enter an amount greater than what they currently have in the treasury, "confirm" should be greyed out. 
@@ -168,7 +174,7 @@ https://sketch.cloud/s/VvZQ8/a/yeovKK
 - The icon can stop and the window can close when the promise returned by the `registerTokens` call resolves.
 
 #### Subsequent edit bond
-https://sketch.cloud/s/VvZQ8/a/g4PVvM
+![Bond initial add (blank)](./images/bond-subsequent-blank.png)
 
 - For subsequent bonding actions (when [bonded balance](#view-bonded-token-balance) is greater than 0) this display should be used.
 - It is similar to the initial bond screen discussed above, but displays the current balance above the entry field, and allows users to un-bond by entering an amount less than their current bonded balance.
@@ -176,7 +182,7 @@ https://sketch.cloud/s/VvZQ8/a/g4PVvM
 - The "update bond" button should be greyed out until a valid amount is entered.
 
 #### Subsequent edit bond enter amount
-https://sketch.cloud/s/VvZQ8/a/8m7GEx
+![Bond initial add (blank)](./images/bond-subsequent-filled.png)
 
 - As an amount is entered, the "update bond" button should become available and the "new order post limit" should be calculated and displayed (after a delay to allow typing).
 - Similar to the [treasury adjust page](#adjust-button):

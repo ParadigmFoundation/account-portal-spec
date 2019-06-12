@@ -123,7 +123,8 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
   ```typescript
   // Viewing user's bonded tokens in PosterRegistry
 
-  const bondedTokens: BigNumber = await kosu.posterRegistry.tokensContributed();
+  const coinbase: string = await web3.eth.getCoinbase();
+  const bondedTokens: BigNumber = await kosu.posterRegistry.tokensRegisteredFor(coinbase);
   ```
 
 ### Bond (register) tokens

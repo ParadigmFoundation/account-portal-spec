@@ -154,3 +154,21 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
       FIVE_TOKENS_WEI,
   );
   ```
+
+### Compute staked tokens
+- **Description:** compute the number of tokens a user has staked in the validator registry.
+- **Methods:**
+  - `kosu.treasury.systemBalance`
+  - `kosu.treasury.currentBalance`
+  - `kosu.posterRegistry.tokensRegisteredFor`
+- **Example:**
+  ```typescript
+  // Example function to get total staked tokens (in wei)
+
+  async function tokensStakedFor(userAddress: string): Promise<BigNumber> {
+    const systemBalance: BigNumber = await kosu.treasury.systemBalance(userAddress);
+    const currentBalance: BigNumber = await kosu.treasury.currentBalance(userAddress);
+    const registeredTokens: BigNumber = await kosu.posterRegistry.tokensRegisteredFor(userAddress);
+    return systemBalance.minus(currentBalance).minus(registeredTokens);
+  }
+  ```

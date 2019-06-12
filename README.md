@@ -53,25 +53,29 @@ https://sketch.cloud/s/VvZQ8/a/dGKYj2
 - Descriptions of each card's contents, and where to load the value from is described below.
 - The "write" actions (deposit, bond, etc.) for this "your tokens" component are described in a later section.
 
-#### In wallet
-- The number of tokens in the users personal wallet.
-- Load this value [by querying the `kosuToken` contract.](#view-token-balance)
-
-#### In treasury
-- The number of tokens deposited in the treasury by the user, and not held up in other contracts (posting, staking, etc.).
-- Load this value [with the `treasury.currentBalance` method.](#view-treasury-balance)
+#### Total balance
+- The sum of the tokens held within the user's wallet, and the Kosu contract system.
+- See [this example for computing total balance.](#compute-total-balance)
 
 #### System balance
 - The number of tokens the user has contained within the entire Kosu system.
 - Load this value [with the `treasury.systemBalance` method.](#view-system-balance)
 
-#### Tokens bonded
+#### In wallet
+- The number of tokens in the users personal wallet.
+- Load this value [by querying the `kosuToken` contract.](#view-token-balance)
+
+#### Bonded
 - The number of tokens the user has bonded in the `PosterRegistry` contract.
 - Load this value [with the `posterRegistry.tokensContributedFor` method.](#view-bonded-token-balance)
 
-#### Tokens staked
+#### Staked
 - The number of tokens the user has at stake in challenges or validator listings. 
 - This value [must be computed based on other balances.](#compute-staked-tokens)
+
+#### In treasury
+- The number of tokens deposited in the treasury by the user, and not held up in other contracts (posting, staking, etc.).
+- Load this value [with the `treasury.currentBalance` method.](#view-treasury-balance)
 
 ### Treasury
 
@@ -81,22 +85,69 @@ As detailed below, the cases of "adding to treasury" and "editing treasury balan
 
 #### Initial add to treasury
 https://sketch.cloud/s/VvZQ8/a/OkrJe8
-- confirm/confirming/confirmed
+
+- If the user [has no tokens in the treasury,](#view-treasury-balance) the "add" button should be displayed in the top-right of the "in treasury" card.
+- Clicking this button brings the user to the state displayed above, where they are prompted to enter an amount of tokens to deposit.
+- If this amount is 0, or greater than their current [wallet balance](#view-token-balance) the "add" button should be disabled.
+- Clicking the "add" button should [deposit tokens into the treasury](#deposit-tokens) of the specified amount.
+- Remember to convert ether (units entered) to wei (units passed to contract call).
+- The "add" button should indicate the transaction is confirming ("adding..." or a spinning loop) until the promise returned by the `deposit` method resolves, at which point the pop-up can close.
 
 #### Display edit button after deposit
 https://sketch.cloud/s/VvZQ8/a/DvxDEq
 
+- If the user [has a non-zero treasury balance](#view-treasury-balance) (i.e. they just deposited, as described above) the "add" button should be replaced with an "edit" button.
+
 #### Edit popup
 https://sketch.cloud/s/VvZQ8/a/jOzY40
 
+- Clicking the "edit" button brings the user to this popup, which prompts to ["edit current balance"](#adjust-button) or to ["remove entire balance"](#withdraw-all).
+- The "edit current balance" brings the user to a further popup (next sub-section).
+- The "remove entire balance" button should [trigger a withdrawal](#withdraw-tokens) after the [confirmation is clicked](#withdraw-all).
+
 #### Adjust button 
 https://sketch.cloud/s/VvZQ8/a/zGRWyW
-- confirm/confirming/confirmed
+
+- The adjust page [displays the users current treasury balance](#view-treasury-balance), and has a field to enter a new balance.
+- After entering a new balance, the page should display the necessary change:
+  - If the new balance is less than current, display "tokens to remove:" and the amount that will be withdrawn.
+  - If the new balance is greater than current, display "tokens to add:" and the amount that will be deposited. 
+- Depending on the users specified new balance, the appropriate call to either [`deposit`](#deposit-tokens) or [`withdraw`](#withdraw-tokens) should be made with the correct amount.
+- Keep in mind the user is entering units of ether, but units of wei must be passed into the deposit and withdraw methods.
+- Clicking update balance should replace the buttons text with a loading animation that spins until the promise from the `withdraw` or `deposit` resolves.
+- After the resulting transaction confirms, the pop-up should close.
+- Sample `updateBalanceTo` method:
+  ```typescript
+  async function updateBalanceTo(newBalance: string): Promise<void> {
+    const newBalanceWei = new BigNumber(web3.utils.toWei(newBalance));
+    const currentBalanceWei = await kosu.treasury.currentBalance(await web3.eth.getCoinbase());
+    if (newBalanceWei.comparedTo(currentBalanceWei) === 1) {
+      // deposit difference
+      return await kosu.treasury.deposit(newBalanceWei.minus(currentBalanceWei));
+    } else if (newBalanceWei.comparedTo(currentBalanceWei) === -1) {
+      // withdraw difference
+      return await kosu.treasury.withdraw(currentBalanceWei.minus(newBalanceWei));
+    } else {
+      // same amount, no action needed
+      return;
+    }
+  }
+  ```
 
 #### Withdraw all 
 https://sketch.cloud/s/VvZQ8/a/l9m9KO
 
+- If the user clicks "remove entire balance" from the [edit popup](#edit-popup), they are prompted to confirm.
+- If they click confirm again, their full [treasury balance](#view-treasury-balance) should be [withdrawn from the treasury](#withdraw-tokens).
+- While the transaction is confirming, the "confirm" text in the button should be replaced with a loading icon that spins until the promise returned by `withdraw` resolves.
+
 ### Bonding
+
+After an allowance is granted to the treasury, the user may "bond" tokens by locking them in the `PosterRegistry` contract.
+
+The "bonded" card within the "your tokens" section has a button ("add"/"edit") that allows the user to bond and un-bond tokens.
+
+Similar to the treasury card, the cases of an "initial add" versus a "subsequent edit" are treated separately at the UI level. This is described below. 
 
 #### Initial add bond
 https://sketch.cloud/s/VvZQ8/a/YAemod
@@ -297,6 +348,21 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
       FIVE_TOKENS_WEI,
   );
   ```
+
+### Compute total balance
+- **Description:** use this sample to compute the total number of Kosu tokens a user has.
+- **Methods:**
+  - `kosu.treasury.systemBalance`
+  - `kosu.kosuToken.balanceOf`
+- **Example:**
+  ```typescript
+  // Computing a users total balance of Kosu tokens
+
+  async function userTotalBalance(userAddress: string): Promise<BigNumber> {
+    const systemBalance = await kosu.treasury.systemBalance(userAddress);
+    const walletBalance = await kosu.kosuToken.balanceOf(userAddress);
+    return systemBalance.plus(walletBalance);
+  }
 
 ### Compute staked tokens
 - **Description:** compute the number of tokens a user has staked in the validator registry.

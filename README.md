@@ -36,6 +36,7 @@ On load, the main page has no ability to display data before the user clicks "co
 ![Connected, no allowance (cropped)](./images/connected-no-allowance.png)
 
 - Displays the main page after `window.ethereum` has been `.enable`d during Metamask connection.
+- The user's `coinbase` address should be displayed next to their [wallet balance](#view-token-balance) of Kosu tokens in the top navigation bar.
 - The methods for loading all data displayed in this image are discussed in the sections below.
 - Treasury, tokens bonded, and tokens staked cards are all greyed out if [no treasury allowance is detected](#view-treasury-allowance).
 - Clicking on one of the greyed out cards prompts the user with a transaction to [set an "unlimited" allowance for the Treasury](#set-treasury-allowance).

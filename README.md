@@ -4,8 +4,8 @@ Specification document (this README), [design screenshots](./images), [code samp
 
 ## Contents
 
-- [Background](#background)
-- [Description](#description)
+- [Background](#background-and-notes)
+- [Specification](#specification)
   - [Main page](#main-page)
     - [Before Metamask connection](#before-metamask-connection)
     - [Connected, no allowance](#connected-no-allowance)
@@ -70,7 +70,7 @@ Specification document (this README), [design screenshots](./images), [code samp
   - _Please reach out to Henry (@hrharder, henry@paradigm.market) when ready to test and he can assist with setting up._
 - Testing on our private PoA development network is necessary to ensure a recent version of the contract system is deployed, and compatibility with the `kosu.js` library.
 
-## Description
+## Specification
 
 The following sections serve to annotate states of [the sketch file](./account.sketch) with the functionality that must be implemented for each.
 

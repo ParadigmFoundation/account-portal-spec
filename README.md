@@ -26,6 +26,8 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
 - **Method:** `kosu.kosuToken.balanceOf`
 - **Example:**
   ```typescript
+  // Viewing user's KOSU wallet balance
+
   const coinbase: string = await web3.eth.getCoinbase();
   const balance: BigNumber = await kosu.kosuToken.balanceOf(coinbase);
   ```
@@ -38,7 +40,7 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
   - To set an "unlimited" allowance, you can use the maximum `uint256` value (shown below).
 - **Example:**
   ```typescript
-  // Setting an "unlimited" treasury allowance
+  // Setting an "unlimited" Treasury allowance
 
   const MAX_UINT_256_STR = "115792089237316195423570985008687907853269984665640564039457584007913129639935";
   const MAX_UINT_256: BigNumber = new BigNumber(MAX_UINT_256_STR);
@@ -56,7 +58,7 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
 - **Note:** this method is useful to detect if an allowance must be set for the user.
 - **Example:**
   ```typescript
-  // Reading the user's treasury allowance
+  // Reading the user's Treasury allowance
 
   const currentAllowance: BigNumber = await kosu.treasury.treasuryAllowance();
   ```
@@ -67,7 +69,7 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
 - **Note:** the user must have sufficient [treasury allowance](#view-treasury-allowance) set prior to depositing.
 - **Example:**
   ```typescript
-  // Depositing 10 KOSU tokens into the treasury
+  // Depositing 10 KOSU tokens into the Treasury
 
   const TEN_TOKENS_WEI: BigNumber = new BigNumber(web3.utils.toWei("10"));
 
@@ -78,31 +80,76 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
   ```
 
 ### Withdraw tokens
-- **Description:**
+- **Description:** transfer tokens from the treasury to the user's wallet.
+- **Method:** `kosu.treasury.withdraw`
 - **Example:**
   ```typescript
-  // Withdrawing 10 KOSU tokens from the treasury
+  // Withdrawing 10 KOSU tokens from the Treasury
 
+  const TEN_TOKENS_WEI: BigNumber = new BigNumber(web3.utils.toWei("10"));
 
+  // will prompt for user signature (i.e. MetaMask)
+  const receipt: TransactionReceiptWithDecodedLogs = await kosu.treasury.withdraw(
+      TEN_TOKENS_WEI,
+  );
   ```
 
 ### View treasury balance
-- **Description:**
+- **Description:** view the number of tokens (in wei) the user currently has in the treasury.
+- **Method:** `kosu.treasury.currentBalance`
 - **Example:**
   ```typescript
-  
+  // Viewing user's current Treasury balance
+
+  const coinbase: string = await web3.eth.getCoinbase();
+  const systemBalance: BigNumber = await kosu.treasury.currentBalance(coinbase);
+  ```
+
+### View system balance
+- **Description:** view the total number of tokens (in wei) the user has in the whole Kosu contract system.
+- **Method:** `kosu.treasury.systemBalance`
+- **Example:**
+  ```typescript
+  // Viewing user's current total system balance
+
+  const coinbase: string = await web3.eth.getCoinbase();
+  const systemBalance: BigNumber = await kosu.treasury.systemBalance(coinbase);
+  ```
+
+### View bonded token balance
+- **Description:** view the total number of tokens (in wei) the user has bonded in the poster registry.
+- **Method:** `kosu.posterRegistry.tokensContributed`
+- **Example:**
+  ```typescript
+  // Viewing user's bonded tokens in PosterRegistry
+
+  const bondedTokens: BigNumber = await kosu.posterRegistry.tokensContributed();
   ```
 
 ### Bond (register) tokens
-- **Description:**
+- **Description:** bond (lock) tokens into the Kosu poster registry contract for access to the Kosu network.
+- **Method:** `kosu.posterRegistry.registerTokens`
 - **Example:**
   ```typescript
+  // Bonding 5 KOSU tokens in the PosterRegistry
+
+  const FIVE_TOKENS_WEI = new BigNumber(web3.utils.toWei("5"));
   
+  const receipt: TransactionReceiptWithDecodedLogs = await kosu.posterRegistry.registerTokens(
+      FIVE_TOKENS_WEI,
+  );
   ```
 
 ### Un-bond (release) tokens
-- **Description:**
+- **Description:** un-bond (unlock) tokens from the Kosu poster registry.
+- **Method:** `kosu.posterRegistry.releaseTokens`
 - **Example:**
   ```typescript
+  // Un-bonding 5 KOSU tokens from the PosterRegistry
+
+  const FIVE_TOKENS_WEI = new BigNumber(web3.utils.toWei("5"));
   
+  const receipt: TransactionReceiptWithDecodedLogs = await kosu.posterRegistry.releaseTokens(
+      FIVE_TOKENS_WEI,
+  );
   ```

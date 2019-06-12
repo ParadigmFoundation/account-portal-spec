@@ -189,6 +189,43 @@ https://sketch.cloud/s/VvZQ8/a/8m7GEx
 ### Order table
 https://sketch.cloud/s/VvZQ8/a/M0P94m
 
+#### RPC API request format
+- This API does not exist yet, but the [data from the section below](#rpc-api-response-format) can be used for mocking.
+- Eventually, a RPC API will be availible to return an array of information about orders a given user has submitted to the network.
+- The API request format will be:
+  ```
+  GET /api/v1/orders?makerAddress=${USER_ADDRESS}&number=${ITEMS_TO_SHOW}
+  ```
+
+#### RPC API response format
+- The response will be sent with `Content-Type: application/json` headers.
+- The response will be an array of objects (below) of the length specified as the "number" query parameter.
+- The response from the eventual RPC API [above](#rpc-api-response-format) will look like:
+  ```json
+  [
+    {
+      "orderId": "0x8976d8e86f1500008976d8e86f15906a8976d8e86f15000040dc8b020190ab56",
+      "type": "Dharma",
+      "expiration": 1560371215
+    },
+    {
+      "orderId": "0x20610504010a2be428610504010000002861050401000000701231030100e3ca",
+      "type": "dY/dX",
+      "expiration": 1560356165
+    },
+    {
+      "orderId": "0xb461050401000000701231030100000206e65d06205040100d46205040100e2b",
+      "type": "0x",
+      "expiration": 1560332518
+    },
+    {
+      "orderId": "0x0b3d075500bb7c51cfa6c746599a223b153d8379ff22ee95c338d8e5c02eff1a",
+      "type": "0x",
+      "expiration": 1560359948
+    }
+  ]
+  ```
+
 ### Past governance activity table
 https://sketch.cloud/s/VvZQ8/a/M0P94m
 

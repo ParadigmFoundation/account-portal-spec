@@ -129,6 +129,7 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
 ### Bond (register) tokens
 - **Description:** bond (lock) tokens into the Kosu poster registry contract for access to the Kosu network.
 - **Method:** `kosu.posterRegistry.registerTokens`
+- **Note:** the user must have sufficient [treasury allowance](#view-treasury-allowance) set prior to bonding.
 - **Example:**
   ```typescript
   // Bonding 5 KOSU tokens in the PosterRegistry

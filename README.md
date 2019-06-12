@@ -33,7 +33,7 @@ https://sketch.cloud/s/VvZQ8/a/VmJeWa
 - If it is determined the browser is incompatible, handle appropriately.
 
 #### Connected, no allowance
-https://sketch.cloud/s/VvZQ8/a/j09vra
+https://sketch.cloud/s/VvZQ8/a/bd5kx9
 
 - Displays the main page after `window.ethereum` has been `.enable`d during Metamask connection.
 - The methods for loading all data displayed in this image are discussed in the sections below.
@@ -41,7 +41,7 @@ https://sketch.cloud/s/VvZQ8/a/j09vra
 - Clicking on one of the greyed out cards prompts the user with a transaction to [set an "unlimited" allowance for the Treasury](#set-treasury-allowance).
 
 #### Connected, allowance set
-https://sketch.cloud/s/VvZQ8/a/44pAoZ
+https://sketch.cloud/s/VvZQ8/a/vJ0WRb
 
 - After an [allowance for the treasury](#set-treasury-allowance) has been set, the cards are fully visible.
 
@@ -150,23 +150,47 @@ The "bonded" card within the "your tokens" section has a button ("add"/"edit") t
 Similar to the treasury card, the cases of an "initial add" versus a "subsequent edit" are treated separately at the UI level. This is described below. 
 
 #### Initial add bond
-https://sketch.cloud/s/VvZQ8/a/YAemod
+https://sketch.cloud/s/VvZQ8/a/7OKeWZ
+
+- The "bonded" tokens card has a "bond" button in the top right.
+- If the user [has no tokens bonded already](#view-bonded-token-balance), clicking bond brings them to this sate.
+- The confirm button is greyed out until they enter an amount (next sub-section).
 
 #### Initial add bond enter amount
-https://sketch.cloud/s/VvZQ8/a/0JZ7lW
-- confirm/confirming/return to main page
+https://sketch.cloud/s/VvZQ8/a/yeovKK
+
+- As the user types in an amount, the progress bar below shows what percentage of their treasury balance it would use. 
+- If they enter an amount greater than what they currently have in the treasury, "confirm" should be greyed out. 
+- As they enter an amount of tokens to bond, an [estimate of their order post limit](#estimate-post-limit) should be displayed.
+- When an amount is entered, clicking "confirm" will [trigger a bond](#bond-register-tokens) of the amount they entered.
+- Be sure to convert to wei from ether, and use a `BigNumber` for the value.
+- Clicking confirm submits the transaction (after prompting for signature), and while the transaction is confirming, a loading icon (in sketch file) should spin.
+- The icon can stop and the window can close when the promise returned by the `registerTokens` call resolves.
 
 #### Subsequent edit bond
-https://sketch.cloud/s/VvZQ8/a/orArb5
+https://sketch.cloud/s/VvZQ8/a/g4PVvM
+
+- For subsequent bonding actions (when [bonded balance](#view-bonded-token-balance) is greater than 0) this display should be used.
+- It is similar to the initial bond screen discussed above, but displays the current balance above the entry field, and allows users to un-bond by entering an amount less than their current bonded balance.
+- "New order post limit" should [be calculated as discussed above.](#estimate-post-limit)
+- The "update bond" button should be greyed out until a valid amount is entered.
 
 #### Subsequent edit bond enter amount
-https://sketch.cloud/s/VvZQ8/a/R4w4M2
+https://sketch.cloud/s/VvZQ8/a/8m7GEx
+
+- As an amount is entered, the "update bond" button should become available and the "new order post limit" should be calculated and displayed (after a delay to allow typing).
+- Similar to the [treasury adjust page](#adjust-button):
+  - If the "new bond amount" is less than "current bond," [the difference should be un-bonded.](#un-bond-release-tokens)
+  - If the "new bond amount" is greater than "current bond," [the difference should be bonded.](#bond-register-tokens)
+- Keep in mind ether/wei conversions and usage of `BigNumber` instances.
+- When "update bond" is clicked, the call to `registerTokens` or `releaseTokens` will trigger a Metamask pop-up and prompt for a signature.
+- While the transaction is being signed/mined, the "update bond" button text should be replaced with a spinning animation that spins until the promise returned by the register/release method resolves.
 
 ### Order table
-https://sketch.cloud/s/VvZQ8/a/pp0pbp
+https://sketch.cloud/s/VvZQ8/a/M0P94m
 
 ### Past governance activity table
-https://sketch.cloud/s/VvZQ8/a/pp0pbp
+https://sketch.cloud/s/VvZQ8/a/M0P94m
 
 ## Code samples
 Demonstrations of implementations of various necessary actions using the `kosu.js` and `web3` libraries.

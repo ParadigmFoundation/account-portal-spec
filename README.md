@@ -227,7 +227,7 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
         case "ValidatorRegistered": {
           const { owner, tendermintPublicKeyHex } = decodedArgs;
           if (owner !== user) {
-            return void 0;
+            break;
           }
 
           const item = {
@@ -278,7 +278,7 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
             challengeId
           } = decodedArgs;
           if (owner !== user && challenger !== user) {
-            return void 0;
+            break;
           }
 
           const item = {

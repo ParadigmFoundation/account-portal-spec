@@ -187,7 +187,14 @@ https://sketch.cloud/s/VvZQ8/a/8m7GEx
 - While the transaction is being signed/mined, the "update bond" button text should be replaced with a spinning animation that spins until the promise returned by the register/release method resolves.
 
 ### Order table
-https://sketch.cloud/s/VvZQ8/a/M0P94m
+
+![Your orders table](./images/your-orders-table.png)
+
+The orders table displays orders the user has submitted to the Kosu network. 
+
+Currently, the infrastructure and services necessary to support this feature are not yet implemented, so it must be mocked temporarily (see below).
+
+In production, the table can simply be empty and display "no orders found" or something of the sort. 
 
 #### RPC API request format
 - This API does not exist yet, but the [data from the section below](#rpc-api-response-format) can be used for mocking.
@@ -227,7 +234,7 @@ https://sketch.cloud/s/VvZQ8/a/M0P94m
   ```
 
 ### Past governance activity table
-https://sketch.cloud/s/VvZQ8/a/M0P94m
+![Past governance activity table](./images/governance-activity-table.png) <!-- https://sketch.cloud/s/VvZQ8/a/M0P94m -->
 
 ## Code samples
 Demonstrations of implementations of various necessary actions using the `kosu.js` and `web3` libraries.

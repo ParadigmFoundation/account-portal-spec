@@ -1,6 +1,6 @@
 # Portal specification: `Account`
 
-Hello, world!
+Specification document (this README), [design screenshots](./images), [code samples](#code-samples), and a [sketch file](./account.sketch) for the Kosu account portal.
 
 ## Contents
 
@@ -34,25 +34,41 @@ Hello, world!
     - [RPC API response format](#rpc-api-response-format)
   - [Past governance activity table](#past-governance-activity-table)
 - [Code samples](#code-samples)
-  - [Connecting to Metamask](#)
-  - [View token balance](#)
-  - [Set treasury allowance](#)
-  - [View treasury allowance](#)
-  - [Deposit tokens](#)
-  - [Withdraw tokens](#)
-  - [View treasury balance](#)
-  - [View system balance](#)
-  - [View bonded token balance](#)
-  - [Bond (register) tokens](#)
-  - [Un-bond (release) tokens](#)
-  - [Compute total balance](#)
-  - [Compute staked balance](#)
+  - [Connecting to Metamask](#connecting-to-metamask)
+  - [View token balance](#view-token-balance)
+  - [Set treasury allowance](#set-treasury-allowance)
+  - [View treasury allowance](#view-treasury-allowance)
+  - [Deposit tokens](#deposit-tokens)
+  - [Withdraw tokens](#withdraw-tokens)
+  - [View treasury balance](#view-treasury-balance)
+  - [View system balance](#view-system-balance)
+  - [View bonded token balance](#view-bonded-token-balance)
+  - [Bond (register) tokens](#bond-register-tokens)
+  - [Un-bond (release) tokens](#un-bond-release-tokens)
+  - [Compute total balance](#compute-total-balance)
+  - [Compute staked balance](#compute-staked-balance)
   - [Load past governance activity](#load-past-governance-activity)
   - [Estimate post limit](#estimate-post-limit)
 
-## Background
+## Background and notes
 
-What's up world.
+- Basic familiarity with `web3`, Metamask, and Ethereum concepts (transactions, signatures, gas, etc.) is assumed.
+- Most numbers for the `kosu` and `web3` libraries are passed and expected as instances of [`BigNumber`.](http://mikemcl.github.io/bignumber.js/)
+- The user (via the UI) should view token balances/amounts in units of ether, however methods will expect units of wei.
+  - Use `web3.utils.toWei` and `web3.utils.fromWei` to convert.
+- Many states are not shown in this document or the [`images`](./images) folder, so the [sketch file](./account.sketch) should be reviewed in detail.
+- Implementing this portal will require usage of the [`@kosu/kosu.js`](https://www.npmjs.com/package/@kosu/kosu.js) library.
+  - It does not have public documentation yet, so the [code samples](#code-samples) section has been included.
+- Know how to use [Metamask](#connecting-to-metamask) with respect to the injected `window.ethereum` provider object.
+- Many methods shown below use `async/await` syntax, however promise syntax and `yield` can be used where necessary.
+- Testing this portal will require usage of the following:
+  - Custom RPC added to Metamask
+    - **Network name:** Kosu Dev PoA
+    - **New RPC URL:** `https://ethnet.zaidan.io/kosu`
+  - Using [`portal.kosu.io`](https://portal.kosu.io) with the correct provider configured.
+  - A specific testing account imported into Metamask. 
+  - _Please reach out to Henry (@hrharder, henry@paradigm.market) when ready to test and he can assist with setting up._
+- Testing on our private PoA development network is necessary to ensure a recent version of the contract system is deployed, and compatibility with the `kosu.js` library.
 
 ## Description
 

@@ -4,7 +4,118 @@ Hello, world!
 
 ## Background
 
+What's up world.
+
 ## Description
+
+The following sections serve to annotate states of [the sketch file](./account.sketch) with the functionality that must be implemented for each.
+
+Code samples for the non-obvious implementation components, and usage of the `kosu.js` library are [included below](#code-samples), and linked to from each detail section.
+
+Many intermediary states (such as the confirm/confirming/confirmed flow for action buttons) are not displayed here for the sake of brevity, so refer to the sketch file for detailed intermediary states.
+
+Be sure to review the sketch file in full for an overall understanding of the interface prior to reviewing this section.
+
+### Main page
+
+The account portal is essentially one main page, with three data/interactive sections:
+- Your tokens: manage your balances within the Kosu system.
+- Your orders: view orders you've posted to the Kosu network.
+- Your governance activity: view your past participation in network governance.
+
+On load, the main page has no ability to display data before the user clicks "connect to Metamask" allowing the web app access to the Ethereum blockchain. 
+
+#### Before Metamask connection
+https://sketch.cloud/s/VvZQ8/a/VmJeWa
+
+- Displays the main page prior to Metamask connection.
+- Upon clicking the button, the app should attempt to [connect to Metamask](#connecting-to-metamask).
+- If it is determined the browser is incompatible, handle appropriately.
+
+#### Connected, no allowance
+https://sketch.cloud/s/VvZQ8/a/j09vra
+
+- Displays the main page after `window.ethereum` has been `.enable`d during Metamask connection.
+- The methods for loading all data displayed in this image are discussed in the sections below.
+- Treasury, tokens bonded, and tokens staked cards are all greyed out if [no treasury allowance is detected](#view-treasury-allowance).
+- Clicking on one of the greyed out cards prompts the user with a transaction to [set an "unlimited" allowance for the Treasury](#set-treasury-allowance).
+
+#### Connected, allowance set
+https://sketch.cloud/s/VvZQ8/a/44pAoZ
+
+- After an [allowance for the treasury](#set-treasury-allowance) has been set, the cards are fully visible.
+
+### Balance page
+_Each card in the "your tokens" UI section has a sub-section here._
+https://sketch.cloud/s/VvZQ8/a/dGKYj2
+
+- The "your tokens" section gives the user information about their token balances, and allows them to interact with the Kosu treasury and poster registry contracts.
+- Descriptions of each card's contents, and where to load the value from is described below.
+- The "write" actions (deposit, bond, etc.) for this "your tokens" component are described in a later section.
+
+#### In wallet
+- The number of tokens in the users personal wallet.
+- Load this value [by querying the `kosuToken` contract.](#view-token-balance)
+
+#### In treasury
+- The number of tokens deposited in the treasury by the user, and not held up in other contracts (posting, staking, etc.).
+- Load this value [with the `treasury.currentBalance` method.](#view-treasury-balance)
+
+#### System balance
+- The number of tokens the user has contained within the entire Kosu system.
+- Load this value [with the `treasury.systemBalance` method.](#view-system-balance)
+
+#### Tokens bonded
+- The number of tokens the user has bonded in the `PosterRegistry` contract.
+- Load this value [with the `posterRegistry.tokensContributedFor` method.](#view-bonded-token-balance)
+
+#### Tokens staked
+- The number of tokens the user has at stake in challenges or validator listings. 
+- This value [must be computed based on other balances.](#compute-staked-tokens)
+
+### Treasury
+
+This section describes how to interact with the treasury beyond just viewing balances (described above) for actions such as `deposit` and `withdraw`.
+
+As detailed below, the cases of "adding to treasury" and "editing treasury balance" are handled separately. I.E., when the user has no treasury balance there is an option to add tokens, which is a separate user flow than if they already had tokens and are editing their balance or withdrawing. 
+
+#### Initial add to treasury
+https://sketch.cloud/s/VvZQ8/a/OkrJe8
+- confirm/confirming/confirmed
+
+#### Display edit button after deposit
+https://sketch.cloud/s/VvZQ8/a/DvxDEq
+
+#### Edit popup
+https://sketch.cloud/s/VvZQ8/a/jOzY40
+
+#### Adjust button 
+https://sketch.cloud/s/VvZQ8/a/zGRWyW
+- confirm/confirming/confirmed
+
+#### Withdraw all 
+https://sketch.cloud/s/VvZQ8/a/l9m9KO
+
+### Bonding
+
+#### Initial add bond
+https://sketch.cloud/s/VvZQ8/a/YAemod
+
+#### Initial add bond enter amount
+https://sketch.cloud/s/VvZQ8/a/0JZ7lW
+- confirm/confirming/return to main page
+
+#### Subsequent edit bond
+https://sketch.cloud/s/VvZQ8/a/orArb5
+
+#### Subsequent edit bond enter amount
+https://sketch.cloud/s/VvZQ8/a/R4w4M2
+
+### Order table
+https://sketch.cloud/s/VvZQ8/a/pp0pbp
+
+### Past governance activity table
+https://sketch.cloud/s/VvZQ8/a/pp0pbp
 
 ## Code samples
 Demonstrations of implementations of various necessary actions using the `kosu.js` and `web3` libraries.
@@ -20,6 +131,37 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
   - Most token values are returned as, and expected in units of wei, so remember to convert where necessary.
   - Methods that use the `await` keyword imply they are in `async` functions, even if not shown.
   - Promise syntax may be used if necessary, but we recommend `async/await` where possible.
+
+### Connecting to Metamask
+- **Description:** the user will trigger this action, which requests from the injected provider to display accounts and access the Ethereum JSONRPC. 
+- **Note:** this action should be triggered by the user, rather than `onload`.
+- **Example:**
+  ```javascript
+  async function connectMetamask() {
+        if (window.ethereum !== void 0) {
+            try {
+                await window.ethereum.enable();
+
+                // load this web3 into state somewhere (needed later)
+                web3 = new Web3(window.ethereum);
+
+                // additionally, store the users address somewhere
+                coinbase = await web3.eth.getCoinbase();
+            } catch (error) {
+                throw new Error("user denied site access");
+            }
+        } else if (window.web3 !== void 0) {
+            // same as above, var (or let) scoped, or stored in redux state
+            web3 = new Web3(web3.currentProvider);
+            coinbase = await web3.eth.getCoinbase();
+
+            // optional
+            global.web3 = web3;
+        } else {
+            throw new Error("non-ethereum browser detected");
+        }
+    }
+  ```
 
 ### View token balance
 - **Description:** view the user's wallet balance of KOSU tokens in wei (does not include treasury balance).

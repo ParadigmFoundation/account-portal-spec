@@ -2,6 +2,54 @@
 
 Hello, world!
 
+## Contents
+
+- [Background](#background)
+- [Description](#description)
+  - [Main page](#main-page)
+    - [Before Metamask connection](#before-metamask-connection)
+    - [Connected, no allowance](#connected-no-allowance)
+    - [Connected, allowance set](#connected-allowance-set)
+  - [Balance page](#balance-page)
+    - [Total balance](#total-balance)
+    - [System balance](#system-balance)
+    - [In wallet](#in-wallet)
+    - [Bonded](#bonded)
+    - [Staked](#staked)
+    - [In treasury](#in-treasury)
+  - [Treasury](#treasury)
+    - [Initial no treasury balance](#initial-no-treasury-balance)
+    - [Initial add to treasury](#initial-add-to-treasury)
+    - [Display edit button after deposit](#display-edit-button-after-deposit)
+    - [Edit popup](#edit-popup)
+    - [Adjust button](#adjust-button)
+    - [Withdraw all](#withdraw-all)
+  - [Bonding](#bonding)
+    - [Initial add bond](#initial-add-bond)
+    - [Initial add bond enter amount](#initial-add-bond-enter-amount)
+    - [Subsequent edit bond](#subsequent-edit-bond)
+    - [Subsequent edit bond enter amount](#subsequent-edit-bond-enter-amount)
+  - [Order table](#order-table)
+    - [RPC API request format](#rpc-api-request-format)
+    - [RPC API response format](#rpc-api-response-format)
+  - [Past governance activity table](#past-governance-activity-table)
+- [Code samples](#code-samples)
+  - [Connecting to Metamask](#)
+  - [View token balance](#)
+  - [Set treasury allowance](#)
+  - [View treasury allowance](#)
+  - [Deposit tokens](#)
+  - [Withdraw tokens](#)
+  - [View treasury balance](#)
+  - [View system balance](#)
+  - [View bonded token balance](#)
+  - [Bond (register) tokens](#)
+  - [Un-bond (release) tokens](#)
+  - [Compute total balance](#)
+  - [Compute staked balance](#)
+  - [Load past governance activity](#load-past-governance-activity)
+  - [Estimate post limit](#estimate-post-limit)
+
 ## Background
 
 What's up world.
@@ -693,4 +741,25 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
     "owner": "0x8b366a3d4e46ac5406f12766ad33e6482ce4f081",
     "listingKey": "0x85e9ebca16ab75eaeca6e6e589c91ec9fa2bbda96275ab629e0b5e9dd7ab9a29"
   }]
+  ```
+
+### Estimate post limit
+- **Description:** estimate a users future order post limit before adjusting their bonded balance.
+- **Note:** user post limit is equal to their proportion of the total bond, times the maximum number of orders the network will accept per period. 
+- **Method:** `kosu.posterRegistry.tokensContributed`
+- **Example:**
+  ```typescript
+  // Estimating a users future order post limit, given a future balance
+
+  // maximum orders accepted by all users per period
+  const ORDER_MAX = new BigNumber(15000)
+
+  async function estimateNewPostLimit(newBalance: BigNumber): Promise<BigNumber> {
+    const totalBonded = await kosu.posterRegistry.tokensContributed();
+    const newTotal = totalBonded.plus(newBalance);
+
+    const futureProportion = newBalance.div(newTotal);
+    const futureLimit = futureProportion.times(ORDER_MAX);
+    return futureLimit;
+  }
   ```

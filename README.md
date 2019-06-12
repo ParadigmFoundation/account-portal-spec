@@ -22,7 +22,7 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
   - Promise syntax may be used if necessary, but we recommend `async/await` where possible.
 
 ### View token balance
-- **Description:** view the user's balance of KOSU tokens in wei (does not include treasury balance).
+- **Description:** view the user's wallet balance of KOSU tokens in wei (does not include treasury balance).
 - **Method:** `kosu.kosuToken.balanceOf`
 - **Example:**
   ```typescript
@@ -171,5 +171,162 @@ Demonstrations of implementations of various necessary actions using the `kosu.j
     const currentBalance: BigNumber = await kosu.treasury.currentBalance(userAddress);
     const registeredTokens: BigNumber = await kosu.posterRegistry.tokensRegisteredFor(userAddress);
     return systemBalance.minus(currentBalance).minus(registeredTokens);
+  }
+  ```
+
+### Load past governance activity
+- **Description:** an example of how to load past governance activity for a given user's account.
+- **Methods:**
+  - `kosu.eventEmitter.getPastDecodedLogs`
+  - `kosu.validatorRegistry.getListing`
+  - `kosu.validatorRegistry.getChallenge`
+- **Example:**
+  ```typescript
+  // Example of loading past governance activity
+
+  const web3 = new Web3("https://ethnet.zaidan.io/kosu");
+  const kosu = new Kosu({ provider: web3.currentProvider });
+
+  interface GovernanceActivityItem {
+    /** The title to display the user. */
+    title: string;
+
+    /** The type of activity, challenge (either created or in) or proposal. */
+    type: "challenge" | "proposal";
+
+    /** Outcome of the governance activity. */
+    status: "rejected" | "accepted" | "pending";
+
+    /** True if there is a action button that should be displayed to user. */
+    actionable: boolean;
+
+    /** If type == challenge, there is a challengeId. */
+    challengeId: BigNumber | null;
+
+    /** If a challenge, there is a challenger (it may be the user). **/
+    challenger: string | null;
+
+    /** The owner will be the user in the case of proposal, or a challenge against them. **/
+    owner: string;
+
+    /** Hex-encoded Tendermint public key used for certain queries. */
+    listingKey: string;
+  }
+
+  export async function getPastGovernanceActivity(userAddress: string): Promise<GovernanceActivityItem[]> {
+    const user = userAddress.toLowerCase();
+    const allLogs = await kosu.eventEmitter.getPastDecodedLogs({
+      fromBlock: 0,
+    });
+
+    const output = [];
+    for (const log of allLogs) {
+      const { decodedArgs } = log as any;
+      const { eventType } = decodedArgs as any;
+      switch (eventType) {
+
+        // event indicating creation of a new proposal
+        case "ValidatorRegistered": {
+          const { owner, tendermintPublicKeyHex } = decodedArgs;
+          if (owner !== user) {
+            return void 0;
+          }
+
+          const item = {
+            type: "proposal",
+            title: "You created a proposal",
+            status: null,
+            actionable: null,
+            challengeId: null,
+            challenger: null,
+            owner,
+            listingKey: tendermintPublicKeyHex,
+          }
+
+          // load listing state from contract system
+          const listing = await kosu.validatorRegistry.getListing(tendermintPublicKeyHex);
+
+          // listing is still pending
+          if (listing.status == 1 && listing.confirmationBlock == 0) {
+            item.actionable = true;
+            item.status = "pending";
+
+            // listing already confirmed
+          } else if (listing.status == 2) {
+            item.actionable = false;
+            item.status = "accepted";
+
+            // listing challenged and rejected
+          } else if (listing.status == 0) {
+            item.actionable = false;
+            item.status = "rejected";
+
+            // listing is currently in challenge 
+          } else if (listing.status == 3) {
+            item.actionable = false;
+            item.status = "pending";
+          }
+
+          output.push(item);
+          break;
+        }
+
+        // event indicating the creation of a challenge
+        case "ValidatorChallenged": {
+          const {
+            owner,
+            challenger,
+            tendermintPublicKeyHex,
+            challengeId
+          } = decodedArgs;
+          if (owner !== user && challenger !== user) {
+            return void 0;
+          }
+
+          const item = {
+            type: "challenge",
+            title: null,
+            status: null,
+            actionable: null,
+            challengeId,
+            challenger,
+            owner,
+            listingKey: tendermintPublicKeyHex,
+          }
+
+          const challenge = await kosu.validatorRegistry.getChallenge(new BigNumber(challengeId));
+          const { listingSnapshot } = challenge;
+
+          if (owner === user) {
+            item.title = `${challenger} challenged your ${listingSnapshot.status === 1 ? "proposal" : "validator listing"}`;
+          } else {
+            item.title = `You challenged ${owner}'s ${listingSnapshot.status === 1 ? "proposal" : "validator listing"}`;
+          }
+
+          if (challenge.finalized === true) {
+            item.actionable = true;
+            if (challenge.passed === true) {
+              item.status = "accepted";
+            } else if (challenge.passed === false) {
+              item.status = "rejected";
+            }
+          } else {
+            item.actionable = false;
+            item.status = "pending";
+          }
+
+          output.push(item);
+          break;
+        }
+
+        // skip events we don't care about
+        default: {
+          break;
+        }
+      }
+    }
+
+    // reverse output so it shows newest first
+    return output.reverse();
   }
   ```

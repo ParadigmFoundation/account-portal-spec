@@ -56,6 +56,8 @@ Specification document (this README), [design screenshots](./images), [code samp
 
 - This spec is intended to be implemented within the [governance portal](https://github.com/ParadigmFoundation/gov-portal-spec).
   - If the two portals are integrated, the account page should use the `web3` instance exposed by the `gov` library at `gov.web3` (so they can share a provider instance).
+  - Similarly, `kosu` should be accessed through `gov.kosu` instead of instantiating a separate `kosu` instance.
+  - Both `gov.kosu` and `gov.web3` can be used after `gov.init()` resolves. 
 - Basic familiarity with `web3`, Metamask, and Ethereum concepts (transactions, signatures, gas, etc.) is assumed.
 - Most numbers for the `kosu` library are passed and expected as instances of [`BigNumber`.](http://mikemcl.github.io/bignumber.js/)
 - The user (via the UI) should view token balances/amounts in units of ether, however methods will expect units of wei.
@@ -333,9 +335,16 @@ In production, the table can simply be empty and display "no orders found" or so
   - If the `type === "validator"` then the button should display "resolved" and not be clickable.
 
 #### Detail links
-```
-@todo: awaiting determination on possibility to integrate w/ account portal.
-```
+- Certain past governance activity objects (as included in the array returned by [the sample code](#load-past-governance-activity)) should link to detail pages within the `governance` portal.
+- If `type === "challenge"`:
+  - If `status === "pending"` the row should link to the challenge detail page that corresponds to `gov.challenges[listingKey]` (indicates a current challenge).
+  - Otherwise, the row should link to the detail page that corresponds to the historical challenge (on the main governance portal) with the same `challengeId`.
+- If `type === "proposal"`:
+  - If `status === "rejected"` the row should not link anywhere (should not be clickable).
+  - If `status === "pending"` the row should link to the current proposal on the governance portal identified by `gov.proposals[listingKey]` (current proposal).
+  - If `status === "accepted"` it implies the proposal is (potentially) a validator:
+    - If there is an object at `gov.validators[listingKey]` the row should link to that detail page.
+    - If there is not an object at `gov.validators[listingKey]` the row should not have a link (not be clickable).
 
 ## Code samples
 Demonstrations of implementations of various necessary actions using the `kosu.js` and `web3` libraries.

@@ -55,6 +55,7 @@ Specification document (this README), [design screenshots](./images), [code samp
 ## Background and notes
 
 - This spec is intended to be implemented within the [governance portal,](https://github.com/ParadigmFoundation/gov-portal-spec) if possible.
+  - If the two portals are integrated, the account page should use the `web3` instance exposed by the `gov` library at `gov.web3` (so they can share a provider instance).
 - Basic familiarity with `web3`, Metamask, and Ethereum concepts (transactions, signatures, gas, etc.) is assumed.
 - Most numbers for the `kosu` and `web3` libraries are passed and expected as instances of [`BigNumber`.](http://mikemcl.github.io/bignumber.js/)
 - The user (via the UI) should view token balances/amounts in units of ether, however methods will expect units of wei.

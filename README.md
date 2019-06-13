@@ -33,6 +33,8 @@ Specification document (this README), [design screenshots](./images), [code samp
     - [RPC API request format](#rpc-api-request-format)
     - [RPC API response format](#rpc-api-response-format)
   - [Past governance activity table](#past-governance-activity-table)
+    - [Actions](#actions)
+    - [Detail links](#detail-links)
 - [Code samples](#code-samples)
   - [Connecting to Metamask](#connecting-to-metamask)
   - [View token balance](#view-token-balance)
@@ -52,6 +54,7 @@ Specification document (this README), [design screenshots](./images), [code samp
 
 ## Background and notes
 
+- This spec is intended to be implemented within the [governance portal,](https://github.com/ParadigmFoundation/gov-portal-spec) if possible.
 - Basic familiarity with `web3`, Metamask, and Ethereum concepts (transactions, signatures, gas, etc.) is assumed.
 - Most numbers for the `kosu` and `web3` libraries are passed and expected as instances of [`BigNumber`.](http://mikemcl.github.io/bignumber.js/)
 - The user (via the UI) should view token balances/amounts in units of ether, however methods will expect units of wei.
@@ -306,6 +309,30 @@ In production, the table can simply be empty and display "no orders found" or so
 
 ### Past governance activity table
 ![Past governance activity table](./images/governance-activity-table.png) <!-- https://sketch.cloud/s/VvZQ8/a/M0P94m -->
+
+- The past governance activity table displays select information about the users past participation in Kosu governance processes.
+- The [extensive example code for this section](#load-past-governance-activity) demonstrates how to build a data structure that allows this table to be rendered. 
+- The returned objects within the array from the example match the table column headers. 
+
+#### Actions
+- The `actionable` property defines if there is an action to be taken on this item, and thus if a clickable button should be displayed.
+- For a given row (and object within the returned array), if `actionable === true`:
+  - If the `type === "proposal"` the action button should display "confirm" and should trigger the following (where `listingKey` comes from the object):
+    ```typescript
+    await kosu.validatorRegistry.confirmListing(listingKey);
+    ```
+  - If the `type === "validator"` then the action button should display "resolve" and should trigger the following (where `challengeId` comes from the object):
+    ```typescript
+    await kosu.validatorRegistry.resolveChallenge(challengeId);
+    ```
+- If `actionable === false` for a given row:
+  - If the `type === "proposal"` then the button should say "confirmed" and not be clickable.
+  - If the `type === "validator"` then the button should display "resolved" and not be clickable.
+
+#### Detail links
+```
+@todo: awaiting determination on possibility to integrate w/ account portal.
+```
 
 ## Code samples
 Demonstrations of implementations of various necessary actions using the `kosu.js` and `web3` libraries.

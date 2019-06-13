@@ -54,21 +54,23 @@ Specification document (this README), [design screenshots](./images), [code samp
 
 ## Background and notes
 
-- This spec is intended to be implemented within the [governance portal,](https://github.com/ParadigmFoundation/gov-portal-spec) if possible.
+- This spec is intended to be implemented within the [governance portal](https://github.com/ParadigmFoundation/gov-portal-spec).
   - If the two portals are integrated, the account page should use the `web3` instance exposed by the `gov` library at `gov.web3` (so they can share a provider instance).
 - Basic familiarity with `web3`, Metamask, and Ethereum concepts (transactions, signatures, gas, etc.) is assumed.
-- Most numbers for the `kosu` and `web3` libraries are passed and expected as instances of [`BigNumber`.](http://mikemcl.github.io/bignumber.js/)
+- Most numbers for the `kosu` library are passed and expected as instances of [`BigNumber`.](http://mikemcl.github.io/bignumber.js/)
 - The user (via the UI) should view token balances/amounts in units of ether, however methods will expect units of wei.
   - Use `web3.utils.toWei` and `web3.utils.fromWei` to convert.
+  - The helper methods from [`Gov`](https://www.npmjs.com/package/@kosu/gov-portal-helper#gov) can be used if preferred.
 - Many states are not shown in this document or the [`images`](./images) folder, so the [sketch file](./account.sketch) should be reviewed in detail.
 - Implementing this portal will require usage of the [`@kosu/kosu.js`](https://www.npmjs.com/package/@kosu/kosu.js) library.
   - It does not have public documentation yet, so the [code samples](#code-samples) section has been included.
+  - There are also type definitions doc strings if you work in TypeScript or your IDE supports them.
 - Know how to use [Metamask](#connecting-to-metamask) with respect to the injected `window.ethereum` provider object.
 - Many methods shown below use `async/await` syntax, however promise syntax and `yield` can be used where necessary.
 - Testing this portal will require usage of the following:
   - Custom RPC added to Metamask
     - **Network name:** Kosu Dev PoA
-    - **New RPC URL:** `https://ethnet.zaidan.io/kosu`
+    - **New RPC URL:** `https://poa.kosu.io/`
   - Using [`portal.kosu.io`](https://portal.kosu.io) with the correct provider configured.
   - A specific testing account imported into Metamask. 
   - _Please reach out to Henry (@hrharder, henry@paradigm.market) when ready to test and he can assist with setting up._
